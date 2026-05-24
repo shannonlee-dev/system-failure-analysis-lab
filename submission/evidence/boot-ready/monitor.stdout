@@ -1,0 +1,15 @@
+====== SYSTEM MONITOR RESULT ======
+
+[HEALTH CHECK]
+Checking process 'agent-app-leak'... [OK] (PID: 11795)
+Tracking process tree... [OK] (PIDS: 11792,11795)
+Checking port 15034... [OK]
+[WARNING] firewall command is not available
+
+[RESOURCE MONITORING]
+CPU Usage : 0.00%
+MEM Usage : 0.1%
+MEM RSS   : 23.6MB
+DISK Used : 1%
+
+[INFO] Log appended: /home/shh921shh4393/.dev/codyssey_mission/2026-main-1-2/submission/evidence/boot-ready/monitor.log

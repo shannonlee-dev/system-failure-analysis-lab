@@ -1,0 +1,66 @@
+>>> Starting Agent Boot Sequence...
+[1/6] Checking User Account               [OK]
+   ... Running as service user 'shh921shh4393' (uid=1267600500)
+[2/6] Verifying Environment Variables     [OK]
+   ... All required Envs correct
+[3/6] Checking Required Files             [OK]
+   ... Verified 'secret.key' with correct key string.
+[4/6] Checking Port Availability          [OK]
+   ... Port 15034 is available.
+[5/6] Verifying Log Permission            [OK]
+   ... Log directory is writable: /home/shh921shh4393/.dev/codyssey_mission/2026-main-1-2/submission/evidence/deadlock/multi-false
+[6/6] Verifying Mission Environment       [OK]
+   ... MEMORY_LIMIT=512MB, CPU_MAX_OCCUPY=10%, MULTI_THREAD_ENABLE=False
+------------------------------------------------------------
+All Boot Checks Passed!
+Agent READY
+2026-05-19 13:43:45,139 [INFO] [SafetyGuard] Process priority lowered (nice=10).
+2026-05-19 13:43:45,139 [INFO] Agent listening at port 15034
+
+==================================================
+ [ Agent Initiate ] Resource Check 
+==================================================
+ [ MEMORY ] Limit: 512MB 		[ OK ]
+ [ CPU    ] Limit: 10%  		[ OK ]
+ [ THREAD ] Concurrency: False 		[ OK ]
+--------------------------------------------------
+ >>> SYSTEM STATUS: STABLE. STARTING WORKLOAD MONITORING...
+==================================================
+
+2026-05-19 13:43:47,140 [INFO] >>> Scenario Selected: [Healthy System Monitoring]
+
+>>> [SYSTEM] ALL CONFIGURATIONS OPTIMAL. RUNNING STABILITY TEST... <<<
+
+2026-05-19 13:43:47,142 [INFO] [Scheduler] Task Scheduler Initialized.
+2026-05-19 13:43:47,142 [INFO] [Scheduler] Registered Tasks: ['Thread-A', 'Thread-B', 'Thread-C']
+2026-05-19 13:43:47,143 [INFO] [Scheduler] Starting task execution...
+2026-05-19 13:43:47,143 [INFO] [Thread-B] Task Started. Calculating... (20%)
+2026-05-19 13:43:47,195 [INFO] [Thread-B] Calculating... (40%)
+2026-05-19 13:43:47,246 [INFO] [Thread-B] Calculating... (60%)
+2026-05-19 13:43:47,297 [INFO] [Thread-B] Calculating... (80%)
+2026-05-19 13:43:47,349 [INFO] [Thread-B] Task Completed. (100%)
+2026-05-19 13:43:47,401 [INFO] [Thread-C] Task Started. Calculating... (20%)
+2026-05-19 13:43:47,453 [INFO] [Thread-C] Calculating... (40%)
+2026-05-19 13:43:47,504 [INFO] [Thread-C] Calculating... (60%)
+2026-05-19 13:43:47,556 [INFO] [Thread-C] Calculating... (80%)
+2026-05-19 13:43:47,608 [INFO] [Thread-C] Task Completed. (100%)
+2026-05-19 13:43:47,659 [INFO] [Thread-A] Task Started. Calculating... (20%)
+2026-05-19 13:43:47,710 [INFO] [Thread-A] Calculating... (40%)
+2026-05-19 13:43:47,762 [INFO] [Thread-A] Calculating... (60%)
+2026-05-19 13:43:47,813 [INFO] [Thread-A] Calculating... (80%)
+2026-05-19 13:43:47,865 [INFO] [Thread-A] Task Completed. (100%)
+2026-05-19 13:43:47,917 [INFO] [Scheduler] All tasks completed.
+2026-05-19 13:43:47,955 [INFO] [CpuWorker] Started. Maximum CPU Limit: 10%
+2026-05-19 13:43:47,955 [INFO] [MemoryWorker] Current Heap: 25MB
+2026-05-19 13:43:47,955 [INFO] [CpuWorker] Current Load: 5.00%
+2026-05-19 13:43:50,992 [INFO] [MemoryWorker] Current Heap: 50MB
+2026-05-19 13:43:51,059 [INFO] [CpuWorker] Current Load: 6.65%
+2026-05-19 13:43:53,163 [INFO] [CpuWorker] Peak reached (10.00%). Starting cooldown...
+2026-05-19 13:43:54,019 [INFO] [MemoryWorker] Current Heap: 75MB
+2026-05-19 13:43:54,164 [INFO] [CpuWorker] Current Load: 10.00%
+2026-05-19 13:43:56,268 [INFO] [CpuWorker] Cooldown complete (5.00%). Resuming load increase...
+2026-05-19 13:43:57,060 [INFO] [MemoryWorker] Current Heap: 100MB
+2026-05-19 13:43:57,269 [INFO] [CpuWorker] Current Load: 5.00%
+2026-05-19 13:43:59,372 [INFO] [CpuWorker] Peak reached (10.00%). Starting cooldown...
+2026-05-19 13:44:00,100 [INFO] [MemoryWorker] Current Heap: 125MB
+2026-05-19 13:44:00,373 [INFO] [CpuWorker] Current Load: 10.00%

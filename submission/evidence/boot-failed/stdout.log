@@ -1,0 +1,16 @@
+>>> Starting Agent Boot Sequence...
+[1/6] Checking User Account               [OK]
+   ... Running as service user 'shh921shh4393' (uid=1267600500)
+[2/6] Verifying Environment Variables     [OK]
+   ... All required Envs correct
+[3/6] Checking Required Files             [FAIL]
+   >>> Invalid Content in secret.key
+   >>>    (Expected: 'agent_api_key_test', Found: 'wrong_key')
+[4/6] Checking Port Availability          [FAIL]
+   >>> Skipped due to previous critical failure.
+[5/6] Verifying Log Permission            [FAIL]
+   >>> Skipped due to previous critical failure.
+[6/6] Verifying Mission Environment       [FAIL]
+   >>> Skipped due to previous critical failure.
+--------------------------------------------------
+System Boot Failed. Process Terminated.
