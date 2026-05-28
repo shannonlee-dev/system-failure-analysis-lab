@@ -178,7 +178,7 @@ echo '[collect] boot-ready'
 run_scenario boot-ready boot-ready 512 10 false 8 1 0
 
 echo '[collect] scheduling-fcfs'
-run_scenario scheduling-fcfs scheduling/round-robin 512 10 false 8 0 0
+run_scenario scheduling-fcfs scheduling/priority 512 10 false 8 0 0
 
 echo '[collect] oom-memory-50'
 run_scenario oom-memory-50 oom/memory-50 50 10 false 8 3 3
