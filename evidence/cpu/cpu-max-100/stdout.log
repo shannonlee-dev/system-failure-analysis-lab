@@ -1,0 +1,39 @@
+>>> Starting Agent Boot Sequence...
+[1/6] Checking User Account               [OK]
+   ... Running as service user 'shannon' (uid=1000)
+[2/6] Verifying Environment Variables     [OK]
+   ... All required Envs correct
+[3/6] Checking Required Files             [OK]
+   ... Verified 'secret.key' with correct key string.
+[4/6] Checking Port Availability          [OK]
+   ... Port 15034 is available.
+[5/6] Verifying Log Permission            [OK]
+   ... Log directory is writable: /home/shannon/__dev/system-failure-analysis-lab/submission/evidence/cpu/cpu-max-100
+[6/6] Verifying Mission Environment       [OK]
+   ... MEMORY_LIMIT=512MB, CPU_MAX_OCCUPY=100%, MULTI_THREAD_ENABLE=False
+------------------------------------------------------------
+All Boot Checks Passed!
+Agent READY
+2026-06-13 17:21:37,679 [INFO] [SafetyGuard] Process priority lowered (nice=10).
+2026-06-13 17:21:37,680 [INFO] Agent listening at port 15034
+
+==================================================
+ [ Agent Initiate ] Resource Check 
+==================================================
+ [ MEMORY ] Limit: 512MB 		[ OK ]
+ [ CPU    ] Limit: 100%  		[ WARNING: Recommend Under 50% ]
+ [ THREAD ] Concurrency: False 		[ OK ]
+--------------------------------------------------
+ >>> SYSTEM STATUS: STABLE. STARTING WORKLOAD MONITORING...
+==================================================
+
+2026-06-13 17:21:39,690 [INFO] [CpuWorker] Started. Maximum CPU Limit: 100%
+2026-06-13 17:21:39,690 [INFO] [CpuWorker] Current Load: 5.00%
+2026-06-13 17:21:42,806 [INFO] [CpuWorker] Current Load: 8.74%
+2026-06-13 17:21:45,919 [INFO] [CpuWorker] Current Load: 17.02%
+2026-06-13 17:21:49,034 [INFO] [CpuWorker] Current Load: 20.45%
+2026-06-13 17:21:52,147 [INFO] [CpuWorker] Current Load: 25.95%
+2026-06-13 17:21:55,264 [INFO] [CpuWorker] Current Load: 33.30%
+2026-06-13 17:21:58,380 [INFO] [CpuWorker] Current Load: 41.96%
+2026-06-13 17:22:01,493 [INFO] [CpuWorker] Current Load: 51.12%
+2026-06-13 17:22:01,594 [CRITICAL] [CpuWorker] CPU Threshold Violated! (51.11999999999999%).

@@ -1,0 +1,48 @@
+--- ps sample ---
+  PID  PPID STAT %CPU %MEM   RSS COMMAND         COMMAND
+16743 15873 S     0.0  0.0  1920 agent-app-leak  /home/shannon/__dev/system-failure-analysis-lab/submission/assets/agent-app-leak/agent-app-leak
+  PID  PPID STAT %CPU %MEM   RSS COMMAND         COMMAND
+16746 16743 SNl   0.9  0.8 69100 agent-app-leak  /home/shannon/__dev/system-failure-analysis-lab/submission/assets/agent-app-leak/agent-app-leak
+
+--- top sample ---
+top - 17:21:26 up  6:44,  0 user,  load average: 0.65, 0.47, 0.36
+Tasks:   1 total,   0 running,   1 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  2.4 us,  1.2 sy,  0.0 ni, 96.3 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st 
+MiB Mem :   7870.2 total,   5031.5 free,   2284.6 used,    717.6 buff/cache     
+MiB Swap:   2048.0 total,   2048.0 free,      0.0 used.   5585.6 avail Mem 
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+16743 shannon   20   0    2904   1920   1792 S   0.0   0.0   0:00.07 agent-app+
+
+--- ps sample ---
+  PID  PPID STAT %CPU %MEM   RSS COMMAND         COMMAND
+16743 15873 S     0.0  0.0  1920 agent-app-leak  /home/shannon/__dev/system-failure-analysis-lab/submission/assets/agent-app-leak/agent-app-leak
+  PID  PPID STAT %CPU %MEM   RSS COMMAND         COMMAND
+16746 16743 SNl   0.9  0.8 69100 agent-app-leak  /home/shannon/__dev/system-failure-analysis-lab/submission/assets/agent-app-leak/agent-app-leak
+
+--- top sample ---
+top - 17:21:27 up  6:44,  0 user,  load average: 0.65, 0.47, 0.36
+Tasks:   1 total,   0 running,   1 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  2.4 us,  1.2 sy,  0.0 ni, 94.0 id,  2.4 wa,  0.0 hi,  0.0 si,  0.0 st 
+MiB Mem :   7870.2 total,   5027.8 free,   2288.1 used,    717.8 buff/cache     
+MiB Swap:   2048.0 total,   2048.0 free,      0.0 used.   5582.1 avail Mem 
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+16743 shannon   20   0    2904   1920   1792 S   0.0   0.0   0:00.07 agent-app+
+
+--- ps sample ---
+  PID  PPID STAT %CPU %MEM   RSS COMMAND         COMMAND
+16743 15873 S     0.0  0.0  1920 agent-app-leak  /home/shannon/__dev/system-failure-analysis-lab/submission/assets/agent-app-leak/agent-app-leak
+  PID  PPID STAT %CPU %MEM   RSS COMMAND         COMMAND
+16746 16743 SNl   0.9  0.8 69100 agent-app-leak  /home/shannon/__dev/system-failure-analysis-lab/submission/assets/agent-app-leak/agent-app-leak
+
+--- top sample ---
+top - 17:21:28 up  6:44,  0 user,  load average: 0.65, 0.47, 0.36
+Tasks:   1 total,   0 running,   1 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  2.4 us,  0.0 sy,  0.0 ni, 96.4 id,  0.0 wa,  0.0 hi,  1.2 si,  0.0 st 
+MiB Mem :   7870.2 total,   5030.8 free,   2285.0 used,    717.8 buff/cache     
+MiB Swap:   2048.0 total,   2048.0 free,      0.0 used.   5585.2 avail Mem 
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+16743 shannon   20   0    2904   1920   1792 S   0.0   0.0   0:00.07 agent-app+
+

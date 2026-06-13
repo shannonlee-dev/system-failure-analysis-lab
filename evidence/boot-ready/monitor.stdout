@@ -1,0 +1,22 @@
+
+====== SYSTEM MONITOR RESULT ======
+
+[HEALTH CHECK]
+Checking process 'agent-app-linux|agent_app.py|agent-app'... [OK] (PID: 15889)
+Checking port 15034... [OK] (LISTEN + TCP connect)
+
+[STATUS CHECK]
+[WARNING] UFW is not active
+
+[RESOURCE MONITORING]
+Agent CPU (1-core basis)   : 0.0%
+Agent MEM (RSS / RAM)      : 0.0% (RSS 1.9MB)
+Agent Runtime              : 00:00:01
+System CPU (all-core busy) : 0.7%
+System MEM (used / total)  : 28.1%
+Agent Home (du)            : 0.0MB
+Agent Log Dir (du)         : 0.0MB
+Agent Disk Budget          : 0.0% (0.0MB / 1024MB)
+
+[INFO] Log appended: /home/shannon/__dev/system-failure-analysis-lab/submission/evidence/boot-ready/monitor.log
+[INFO] Warning count: 1
