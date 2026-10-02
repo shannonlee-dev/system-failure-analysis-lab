@@ -6,7 +6,6 @@ from collections.abc import Iterable
 
 from .model import CpuSample, RateRow, SpikeWindow
 
-
 LINE_RE = re.compile(
     r"^\[(?P<ts>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?)\]\s+"
     r"PID:(?P<pid>\d+)\s+"
@@ -49,7 +48,9 @@ def compute_rates(samples: list[CpuSample]) -> list[RateRow]:
         if prev_sample is None:
             rows.append(RateRow(sample.timestamp, sample.cpu, 0.0, 0.0, 0.0))
         else:
-            delta_t = max(0.0, (sample.timestamp - prev_sample.timestamp).total_seconds())
+            delta_t = max(
+                0.0, (sample.timestamp - prev_sample.timestamp).total_seconds()
+            )
             delta_cpu = sample.cpu - prev_sample.cpu
             rate = 0.0 if delta_t == 0 else delta_cpu / delta_t
             rows.append(RateRow(sample.timestamp, sample.cpu, delta_cpu, delta_t, rate))
@@ -91,4 +92,3 @@ def find_spike_windows(rows: list[RateRow]) -> list[SpikeWindow]:
             )
         )
     return windows
-

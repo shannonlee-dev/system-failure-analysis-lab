@@ -8,17 +8,41 @@ from .io import read_samples, write_csv
 from .plot import try_plot
 from .report import write_report
 
-
-PROJECT_DIR = Path(__file__).resolve().parents[2]
+_CHECKOUT_DIR = Path(__file__).resolve().parents[3]
+PROJECT_DIR = (
+    _CHECKOUT_DIR if (_CHECKOUT_DIR / "pyproject.toml").is_file() else Path.cwd()
+)
 DEFAULT_SPIKE_DIR = PROJECT_DIR / "evidence" / "cpu" / "spike"
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="monitor.sh 로그에서 CPU 급상승 구간을 분석합니다.")
-    parser.add_argument("--input", default=DEFAULT_SPIKE_DIR / "monitor_cpu.log", type=Path, help="입력 로그 경로")
-    parser.add_argument("--csv", default=DEFAULT_SPIKE_DIR / "cpu_spike.csv", type=Path, help="CSV 출력 경로")
-    parser.add_argument("--report", default=DEFAULT_SPIKE_DIR / "cpu_spike.md", type=Path, help="Markdown 리포트 경로")
-    parser.add_argument("--plot", default=DEFAULT_SPIKE_DIR / "cpu_spike.png", type=Path, help="PNG 그래프 경로")
+    parser = argparse.ArgumentParser(
+        description="monitor.sh 로그에서 CPU 급상승 구간을 분석합니다."
+    )
+    parser.add_argument(
+        "--input",
+        default=DEFAULT_SPIKE_DIR / "monitor_cpu.log",
+        type=Path,
+        help="입력 로그 경로",
+    )
+    parser.add_argument(
+        "--csv",
+        default=DEFAULT_SPIKE_DIR / "cpu_spike.csv",
+        type=Path,
+        help="CSV 출력 경로",
+    )
+    parser.add_argument(
+        "--report",
+        default=DEFAULT_SPIKE_DIR / "cpu_spike.md",
+        type=Path,
+        help="Markdown 리포트 경로",
+    )
+    parser.add_argument(
+        "--plot",
+        default=DEFAULT_SPIKE_DIR / "cpu_spike.png",
+        type=Path,
+        help="PNG 그래프 경로",
+    )
     return parser
 
 
@@ -45,4 +69,3 @@ def main() -> int:
         print("[WARN] matplotlib을 사용할 수 없어 그래프 생성을 건너뛰었습니다.")
     print(f"[OK] 리포트: {args.report}")
     return 0
-

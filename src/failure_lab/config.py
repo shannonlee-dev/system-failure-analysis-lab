@@ -11,7 +11,7 @@ def config_value(key: str, default: str = "") -> str:
     prefix = f"export {key}="
     for line in CONFIG.read_text().splitlines():
         if line.startswith(prefix):
-            value = line[len(prefix):].strip()
+            value = line[len(prefix) :].strip()
             if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
                 value = value[1:-1]
             return os.path.expandvars(value)
@@ -33,7 +33,7 @@ def env_value(lines: list[str], key: str) -> str:
     prefix = f"export {key}="
     for line in lines:
         if line.startswith(prefix):
-            return line[len(prefix):]
+            return line[len(prefix) :]
     return ""
 
 
@@ -51,4 +51,3 @@ def replace_env_value(lines: list[str], key: str, value: str) -> list[str]:
     if not changed:
         next_lines.append(replacement)
     return next_lines
-

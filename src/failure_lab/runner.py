@@ -18,5 +18,6 @@ def run(command: list[str]) -> int:
 
 def run_shell(command: str) -> int:
     print(S.dim(f"$ {command}"))
-    return subprocess.run(["bash", "-lc", command], cwd=str(ROOT), check=False).returncode
-
+    return subprocess.run(
+        ["bash", "-lc", command], cwd=str(ROOT), check=False
+    ).returncode

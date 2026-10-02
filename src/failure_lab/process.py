@@ -136,4 +136,3 @@ def terminate_pids(pids: set[int]) -> set[int]:
                     break
                 time.sleep(0.1)
     return set(targets)
-

@@ -1,57 +1,29 @@
 # 프로젝트 구조
 
-이 저장소는 재현 가능한 시스템 장애 분석 랩으로 구성되어 있습니다.
-
 ```text
-.
-├── README.md
-├── main.py
-├── lab/
-│   ├── app.py
-│   ├── cli.py
-│   ├── commands.py
-│   ├── config.py
-│   ├── constant.py
-│   ├── process.py
-│   ├── runner.py
-│   └── ui.py
-├── config/
-├── assets/
-├── scripts/
-├── tools/
-│   ├── cpu_spike_analyzer.py
-│   └── cpu_spike/
-├── evidence/
-├── reports/
-├── screenshots/
-└── docs/
-    ├── structure.md
-    └── usage.md
+system-failure-analysis-lab/
+├── src/failure_lab/
+│   ├── __main__.py          # 모듈 실행 진입점
+│   ├── cli.py               # 인자 파싱과 명령 분기
+│   ├── menu.py              # 대화형 메뉴와 종료 정리
+│   ├── operations.py        # 환경 편집·수집·분석 명령
+│   ├── app.py               # 실험 앱 실행·종료
+│   ├── process.py           # 프로세스·포트 조회
+│   ├── config.py            # 실험 환경 파일 처리
+│   └── cpu_spike/           # 파싱·계산·CSV·보고서·그래프
+├── tests/                   # 분석 회귀 테스트와 임시 경로 실행 검사
+├── scripts/                 # 수집·샘플링·문법 검사 도구
+├── config/                  # 실험 환경 예시
+├── assets/                  # 기존 실험 바이너리와 압축 파일
+├── evidence/                # 보존한 실험 로그
+├── reports/                 # 원인 분석 보고서
+├── docs/                    # 구조·사용법
+├── .github/                 # 검증·이슈·의존성 갱신 설정
+├── pyproject.toml           # 패키지와 명령·개발 도구
+├── uv.lock                  # 설치 버전 잠금
+└── Makefile                 # 설치·검증·테스트·빌드·실행
 ```
 
-## 경계
+`uv run --frozen failure-lab`은 실험 실행을, `uv run --frozen cpu-spike`는 저장된 로그 분석을 시작합니다. CPU 분석은 입력·출력 경로를 지정해 기존 증빙과 분리합니다.
 
-| 경로 | 역할 |
-| --- | --- |
-| `README.md` | 프로젝트 개요와 빠른 실행 안내 |
-| `main.py` | 안정적인 사용자 CLI 진입점 |
-| `lab/constant.py` | 프로젝트 경로와 공통 상수 |
-| `lab/` | 앱 실행, 환경 편집, 프로세스 관리, CLI 메뉴 구현 |
-| `config/` | 기본 실행 환경 |
-| `assets/` | 대상 앱 바이너리와 압축 파일 |
-| `scripts/` | 시나리오 실행 및 모니터링 스크립트 |
-| `tools/` | 분석 도구와 실행 wrapper |
-| `tools/cpu_spike/` | CPU 급상승 분석기의 세부 모듈 |
-| `evidence/` | 시나리오별 원본 증거 |
-| `reports/` | 사람이 읽는 분석 리포트 |
-| `screenshots/` | 시각 자료 |
-| `docs/` | 유지보수용 문서 |
-
-## 규칙
-
-- 사용자 명령은 `main.py`를 통해 실행합니다.
-- 경로와 환경 키는 `lab/constant.py`에서 관리합니다.
-- 쉘 기반 워크플로는 `scripts/`에 둡니다.
-- 파이썬 분석 로직은 기능별 패키지로 나누고, 기존 실행 파일은 wrapper로 유지합니다.
-- 원본 증거와 분석 리포트는 섞지 않습니다.
-- 생성 캐시는 `.gitignore`에 추가하고 커밋하지 않습니다.
+운영 자산은 Python 소스와 구분합니다. 실험 명령은 저장소의 `config/`, `scripts/`, `assets/`를 사용하며 Linux 실습 환경이 필요합니다. 앱 실행 없이 수행하는 `make smoke`는 기존 CPU 로그를 임시 디렉토리로 분석합니다.

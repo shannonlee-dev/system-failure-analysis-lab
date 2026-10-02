@@ -49,9 +49,15 @@ def write_report(
         file.write("## 2. 분석 방법\n\n")
         file.write("- 입력 로그에서 timestamp와 CPU 사용률 값을 추출하였다.\n")
         file.write("- 각 샘플 사이의 CPU 변화량을 계산하였다.\n")
-        file.write("- 변화량을 시간 간격으로 나누어 `Delta CPU / Delta t (%/s)`를 계산하였다.\n")
-        file.write("- `CPU[i] > CPU[i-1]` 이고 `CPU[i] >= CPU[i+1]`이면 `CPU[i]`를 극대값으로 판단하였다.\n")
-        file.write("- 극대값이 확인되면 `CPU[i-1] -> CPU[i]` 구간을 급상승 구간으로 표시하였다.\n\n")
+        file.write(
+            "- 변화량을 시간 간격으로 나누어 `Delta CPU / Delta t (%/s)`를 계산하였다.\n"
+        )
+        file.write(
+            "- `CPU[i] > CPU[i-1]` 이고 `CPU[i] >= CPU[i+1]`이면 `CPU[i]`를 극대값으로 판단하였다.\n"
+        )
+        file.write(
+            "- 극대값이 확인되면 `CPU[i-1] -> CPU[i]` 구간을 급상승 구간으로 표시하였다.\n\n"
+        )
 
         file.write("## 3. 요약 결과\n\n")
         file.write(f"- 분석 샘플 수: {total}개\n")
@@ -59,10 +65,18 @@ def write_report(
         file.write(f"- 분석 종료 시각: {fmt_ts(end_ts)}\n")
         file.write(f"- 분석 구간 길이: {duration_sec:.2f}초\n")
         file.write(f"- 평균 CPU 사용률: {avg_cpu:.2f}%\n")
-        file.write(f"- 최대 CPU 사용률: {max_cpu:.2f}% at {fmt_ts(max_cpu_row.timestamp)}\n")
-        file.write(f"- 최소 CPU 사용률: {min_cpu:.2f}% at {fmt_ts(min_cpu_row.timestamp)}\n")
-        file.write(f"- 최대 CPU 증가율: {max_rate_row.rate:.2f}%/s at {fmt_ts(max_rate_row.timestamp)}\n")
-        file.write(f"- 최대 CPU 감소율: {min_rate_row.rate:.2f}%/s at {fmt_ts(min_rate_row.timestamp)}\n")
+        file.write(
+            f"- 최대 CPU 사용률: {max_cpu:.2f}% at {fmt_ts(max_cpu_row.timestamp)}\n"
+        )
+        file.write(
+            f"- 최소 CPU 사용률: {min_cpu:.2f}% at {fmt_ts(min_cpu_row.timestamp)}\n"
+        )
+        file.write(
+            f"- 최대 CPU 증가율: {max_rate_row.rate:.2f}%/s at {fmt_ts(max_rate_row.timestamp)}\n"
+        )
+        file.write(
+            f"- 최대 CPU 감소율: {min_rate_row.rate:.2f}%/s at {fmt_ts(min_rate_row.timestamp)}\n"
+        )
         file.write(f"- 탐지된 급상승 구간 수: {spike_count}개\n\n")
 
         file.write("## 4. 산출 파일\n\n")
@@ -73,9 +87,13 @@ def write_report(
 
         file.write("## 5. CPU 급상승 구간 분석\n\n")
         if not windows:
-            file.write("극대값으로 확인된 샘플이 없어 급상승 구간은 확인되지 않았다.\n\n")
+            file.write(
+                "극대값으로 확인된 샘플이 없어 급상승 구간은 확인되지 않았다.\n\n"
+            )
         else:
-            file.write("다음 구간에서 극대값이 생성되어 직전 구간을 급상승 구간으로 표시하였다.\n\n")
+            file.write(
+                "다음 구간에서 극대값이 생성되어 직전 구간을 급상승 구간으로 표시하였다.\n\n"
+            )
             for index, window in enumerate(windows, 1):
                 file.write(
                     f"- 구간 {index}: {fmt_ts(window.start)} -> {fmt_ts(window.end)}, "
@@ -106,4 +124,3 @@ def write_report(
             "최종 판단은 본 그래프만으로 단정하지 않고 `agent_app.log`, `top/ps` 출력, "
             "프로세스 종료 코드, `CpuWorker` 관련 로그를 함께 근거로 삼는 것이 적절하다.\n"
         )
-

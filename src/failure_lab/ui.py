@@ -37,7 +37,7 @@ def header() -> None:
         os.system("clear")
     print(S.title("시스템 장애 분석 랩"))
     print("장애 증거, 모니터 출력, 분석 리포트를 한 곳에서 다룹니다.")
-    print(S.dim("인자 모드도 지원합니다: python3 main.py --help"))
+    print(S.dim("인자 모드도 지원합니다: uv run failure-lab --help"))
     print(S.dim(f"저장소: {ROOT}"))
     print()
 
@@ -45,4 +45,3 @@ def header() -> None:
 def pause(interactive: bool) -> None:
     if interactive:
         input(S.dim("\nEnter를 누르면 메뉴로 돌아갑니다. "))
-

@@ -29,8 +29,8 @@ CPU 사용률 자체뿐 아니라, 연속된 두 샘플 사이의 CPU 변화량�
 
 ## 4. 산출 파일
 
-- CSV 분석 결과: `/home/shannon/__dev/system-failure-analysis-lab/evidence/cpu/spike/cpu_spike.csv`
-- CPU 그래프: `/home/shannon/__dev/system-failure-analysis-lab/evidence/cpu/spike/cpu_spike.png`
+- CSV 분석 결과: `evidence/cpu/spike/cpu_spike.csv`
+- CPU 그래프: `evidence/cpu/spike/cpu_spike.png`
 
 ## 5. CPU 급상승 구간 분석
 

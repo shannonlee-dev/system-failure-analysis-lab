@@ -47,7 +47,7 @@ CPU 변화율 분석:
 - `evidence/cpu/spike/monitor_cpu.log`
 - `evidence/cpu/spike/cpu_spike.csv`
 - `evidence/cpu/spike/cpu_spike.png`
-- `evidence/cpu/spike/cpu_spike.md`
+- [CPU 급상승 분석 보고서](cpu_spike.md)
 
 ## 3. 원인 분석
 

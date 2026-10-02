@@ -30,4 +30,3 @@ class SpikeWindow:
     delta_cpu: float
     delta_t: float
     rate: float
-

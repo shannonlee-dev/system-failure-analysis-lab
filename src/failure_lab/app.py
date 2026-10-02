@@ -13,7 +13,6 @@ from .process import agent_process_pids, pids_listening_on_port, terminate_pids
 from .runner import run_shell
 from .ui import S, header, pause
 
-
 STARTED_PIDS: set[int] = set()
 
 
@@ -30,7 +29,11 @@ def stop_app(*, interactive: bool = True, force_port: bool = True) -> int:
     STARTED_PIDS.difference_update(killed)
     remaining = pids_listening_on_port(port)
     if remaining:
-        print(S.warn(f"포트 {port} 리스너가 남아 있습니다: {', '.join(map(str, sorted(remaining)))}"))
+        print(
+            S.warn(
+                f"포트 {port} 리스너가 남아 있습니다: {', '.join(map(str, sorted(remaining)))}"
+            )
+        )
         pause(interactive)
         return 1
     if killed:
@@ -49,7 +52,11 @@ def ensure_app() -> bool:
         return False
 
     machine = platform.machine().lower()
-    member = "agent-leak-app-arm64" if machine in {"aarch64", "arm64"} else "agent-leak-app-x86"
+    member = (
+        "agent-leak-app-arm64"
+        if machine in {"aarch64", "arm64"}
+        else "agent-leak-app-x86"
+    )
     try:
         with zipfile.ZipFile(APP_ZIP) as zf:
             data = zf.read(member)
@@ -121,7 +128,11 @@ exec {shlex.quote(str(APP))}
         listeners = pids_listening_on_port(port)
         if listeners:
             STARTED_PIDS.update(listeners)
-            print(S.ok(f"앱 실행 중: PID {', '.join(map(str, sorted(listeners)))}, port {port}"))
+            print(
+                S.ok(
+                    f"앱 실행 중: PID {', '.join(map(str, sorted(listeners)))}, port {port}"
+                )
+            )
             pause(interactive)
             return 0
         time.sleep(0.2)
@@ -132,7 +143,8 @@ exec {shlex.quote(str(APP))}
         print(S.dim(f"stderr: {stderr_path.relative_to(ROOT)}"))
         pause(interactive)
         return proc.returncode or 1
-    print(S.warn(f"앱을 시작했지만 포트 {port} 확인이 지연되고 있습니다. PID {proc.pid}"))
+    print(
+        S.warn(f"앱을 시작했지만 포트 {port} 확인이 지연되고 있습니다. PID {proc.pid}")
+    )
     pause(interactive)
     return 0
-

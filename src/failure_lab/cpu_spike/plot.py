@@ -20,7 +20,9 @@ def try_plot(rows: list[RateRow], windows: list[SpikeWindow], out_path: Path) ->
     rate_vals = [row.rate for row in rows]
     peak_rows = [row for row in rows if row.is_local_max]
 
-    top_windows = sorted(windows, key=lambda window: (window.peak_cpu, window.rate), reverse=True)[:8]
+    top_windows = sorted(
+        windows, key=lambda window: (window.peak_cpu, window.rate), reverse=True
+    )[:8]
     top_peak_times = {window.peak_ts for window in top_windows}
     top_peak_rows = [row for row in peak_rows if row.timestamp in top_peak_times]
 
@@ -42,13 +44,24 @@ def try_plot(rows: list[RateRow], windows: list[SpikeWindow], out_path: Path) ->
 
     for window in top_windows:
         for ax in (ax_cpu, ax_rate):
-            ax.axvspan(window.start, window.end, color="#f97316", alpha=0.10, linewidth=0)
+            ax.axvspan(
+                window.start, window.end, color="#f97316", alpha=0.10, linewidth=0
+            )
 
-    ax_cpu.step(timestamps, cpu_vals, where="post", color="#2563eb", linewidth=1.5, label="CPU (%)")
+    ax_cpu.step(
+        timestamps,
+        cpu_vals,
+        where="post",
+        color="#2563eb",
+        linewidth=1.5,
+        label="CPU (%)",
+    )
     ax_cpu.fill_between(timestamps, cpu_vals, step="post", color="#93c5fd", alpha=0.20)
     ax_cpu.set_ylabel("CPU (%)")
     ax_cpu.set_ylim(0, max(10, max(cpu_vals) * 1.18))
-    ax_cpu.set_title("CPU Spike Analysis", loc="left", fontsize=14, fontweight="bold", pad=10)
+    ax_cpu.set_title(
+        "CPU Spike Analysis", loc="left", fontsize=14, fontweight="bold", pad=10
+    )
 
     if peak_rows:
         ax_cpu.scatter(
@@ -77,7 +90,9 @@ def try_plot(rows: list[RateRow], windows: list[SpikeWindow], out_path: Path) ->
         for row in sorted(top_peak_rows, key=lambda item: item.cpu, reverse=True):
             if len(annotated_times) >= 5:
                 break
-            if any(abs((row.timestamp - ts).total_seconds()) < 3 for ts in annotated_times):
+            if any(
+                abs((row.timestamp - ts).total_seconds()) < 3 for ts in annotated_times
+            ):
                 continue
             offset = annotation_offsets[len(annotated_times)]
             ax_cpu.annotate(
@@ -91,7 +106,14 @@ def try_plot(rows: list[RateRow], windows: list[SpikeWindow], out_path: Path) ->
             )
             annotated_times.append(row.timestamp)
 
-    ax_rate.plot(timestamps, rate_vals, color="#ef4444", linewidth=0.9, alpha=0.75, label="Delta CPU / sec")
+    ax_rate.plot(
+        timestamps,
+        rate_vals,
+        color="#ef4444",
+        linewidth=0.9,
+        alpha=0.75,
+        label="Delta CPU / sec",
+    )
     ax_rate.axhline(0, color="#6b7280", linewidth=0.8)
     ax_rate.set_ylabel("Delta (%/s)")
     ax_rate.set_xlabel("Time")

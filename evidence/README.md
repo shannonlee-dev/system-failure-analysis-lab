@@ -11,4 +11,4 @@
 | `oom/` | 메모리 제한 비교 증거 |
 | `scheduling/` | 스케줄러 동작 증거 |
 
-`python3 main.py start`로 생성되는 대화형 로그는 `evidence/interactive/`에 저장되며 git 추적 대상에서 제외됩니다.
+`uv run --frozen failure-lab start`로 생성되는 대화형 로그는 `evidence/interactive/`에 저장되며 git 추적 대상에서 제외됩니다.

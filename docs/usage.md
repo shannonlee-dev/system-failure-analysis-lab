@@ -7,20 +7,20 @@
 대화형 메뉴:
 
 ```bash
-python3 main.py
+uv run --frozen failure-lab
 ```
 
 스크립트형 명령:
 
 ```bash
-python3 main.py start
-python3 main.py stop
-python3 main.py edit-env
-python3 main.py monitor
-python3 main.py sample-cpu
-python3 main.py collect
-python3 main.py analyze-cpu
-python3 main.py check
+uv run --frozen failure-lab start
+uv run --frozen failure-lab stop
+uv run --frozen failure-lab edit-env
+uv run --frozen failure-lab monitor
+uv run --frozen failure-lab sample-cpu
+uv run --frozen failure-lab collect
+uv run --frozen failure-lab analyze-cpu
+uv run --frozen failure-lab check
 ```
 
 ## 주요 명령
@@ -47,6 +47,6 @@ python3 main.py check
 
 ## 메모
 
-- `python3 main.py start`의 대화형 실행 로그는 `evidence/interactive/`에 저장됩니다.
+- `uv run --frozen failure-lab start`의 대화형 실행 로그는 `evidence/interactive/`에 저장됩니다.
 - CPU 그래프는 `matplotlib`이 설치되어 있을 때만 생성됩니다.
 - 리포트는 관찰된 사실과 추론을 구분해서 작성합니다.

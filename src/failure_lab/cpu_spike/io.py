@@ -16,7 +16,17 @@ def write_csv(rows: list[RateRow], out_path: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
-        writer.writerow(["timestamp", "cpu", "delta_cpu", "delta_t", "rate", "is_local_max", "is_spike"])
+        writer.writerow(
+            [
+                "timestamp",
+                "cpu",
+                "delta_cpu",
+                "delta_t",
+                "rate",
+                "is_local_max",
+                "is_spike",
+            ]
+        )
         for row in rows:
             writer.writerow(
                 [
@@ -29,4 +39,3 @@ def write_csv(rows: list[RateRow], out_path: Path) -> None:
                     "1" if row.is_spike else "0",
                 ]
             )
-
