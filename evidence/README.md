@@ -12,3 +12,5 @@
 | `scheduling/` | 스케줄러 동작 증거 |
 
 `uv run --frozen failure-lab start`로 생성되는 대화형 로그는 `evidence/interactive/`에 저장되며 git 추적 대상에서 제외됩니다.
+
+새 `collect`와 `sample-cpu` 결과는 `.runtime/`의 실행별 디렉토리에 생성합니다. `--output`으로 지정한 경로도 새 경로여야 합니다. 이 디렉토리의 과거 원본은 자동 교체하지 않습니다. 과거 수집에는 앱 종료 코드와 수집 실패 요약이 없고, 일부 `ps_top.log`는 비어 있습니다. 모니터가 실제 워커 대신 런처를 측정한 경우도 있어, 해당 CPU·RSS 샘플을 워커의 자원 사용량으로 해석해서는 안 됩니다.

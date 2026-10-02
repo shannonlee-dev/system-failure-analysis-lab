@@ -13,6 +13,7 @@ PROJECT_DIR = (
     _CHECKOUT_DIR if (_CHECKOUT_DIR / "pyproject.toml").is_file() else Path.cwd()
 )
 DEFAULT_SPIKE_DIR = PROJECT_DIR / "evidence" / "cpu" / "spike"
+DEFAULT_OUTPUT_DIR = PROJECT_DIR / ".runtime" / "cpu-analysis"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -27,21 +28,24 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--csv",
-        default=DEFAULT_SPIKE_DIR / "cpu_spike.csv",
+        default=DEFAULT_OUTPUT_DIR / "cpu_spike.csv",
         type=Path,
         help="CSV 출력 경로",
     )
     parser.add_argument(
         "--report",
-        default=DEFAULT_SPIKE_DIR / "cpu_spike.md",
+        default=DEFAULT_OUTPUT_DIR / "cpu_spike.md",
         type=Path,
         help="Markdown 리포트 경로",
     )
     parser.add_argument(
         "--plot",
-        default=DEFAULT_SPIKE_DIR / "cpu_spike.png",
+        default=DEFAULT_OUTPUT_DIR / "cpu_spike.png",
         type=Path,
         help="PNG 그래프 경로",
+    )
+    parser.add_argument(
+        "--overwrite", action="store_true", help="기존 분석 출력 교체 허용"
     )
     return parser
 
@@ -50,6 +54,11 @@ def main() -> int:
     args = build_parser().parse_args()
     if not args.input.is_file():
         raise SystemExit(f"입력 파일을 찾을 수 없습니다: {args.input}")
+    outputs = [path.resolve() for path in (args.csv, args.report, args.plot)]
+    if args.input.resolve() in outputs or len(set(outputs)) != len(outputs):
+        raise SystemExit("입력과 출력, 각 출력 경로는 서로 달라야 합니다.")
+    if not args.overwrite and any(path.exists() for path in outputs):
+        raise SystemExit("기존 출력이 있습니다. 새 경로나 --overwrite를 지정하세요.")
 
     samples = read_samples(args.input)
     if len(samples) < 2:

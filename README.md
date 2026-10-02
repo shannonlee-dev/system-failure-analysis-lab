@@ -64,7 +64,7 @@ uv run --frozen failure-lab
 uv run --frozen failure-lab check
 ```
 
-`start`, `stop`, `edit-env`, `monitor`, `sample-cpu`, `collect`, `analyze-cpu` 명령을 제공합니다. OOM·CPU 부하·데드락 실험과 `stop`은 시스템 자원·프로세스에 영향을 주므로 준비한 실습 환경에서 [사용법](docs/usage.md)에 따라 실행합니다. `collect`와 기본 분석 명령은 기존 증빙 경로에 기록할 수 있습니다.
+`start`, `stop`, `edit-env`, `monitor`, `sample-cpu`, `collect`, `analyze-cpu` 명령을 제공합니다. OOM·CPU 부하·데드락 실험과 `stop`은 시스템 자원·프로세스에 영향을 주므로 준비한 실습 환경에서 [사용법](docs/usage.md)에 따라 실행합니다. `collect`와 `sample-cpu`는 `.runtime/`의 새 실행 디렉토리에 기록합니다. `--output`으로 새 경로를 지정할 수 있으며 기존 경로는 거부합니다. 기본 분석 출력도 `.runtime/cpu-analysis/`에 보관하고, 기존 분석 출력의 교체에는 `cpu-spike --overwrite`가 필요합니다.
 
 원본 로그를 보존하며 분석하려면 출력 경로를 별도로 지정합니다.
 
@@ -81,7 +81,7 @@ make test
 make smoke
 ```
 
-`make check`는 정적 분석·포맷·문서 검사를, `make test`는 `uv run --frozen pytest -q`로 전체 동작 검사를 실행합니다. `make smoke`는 같은 테스트 중 `smoke` 마커가 붙은 실행 확인만 선택합니다(`uv run --frozen pytest -q -m smoke`). 테스트는 `test_*.py`와 fixture로 구성하며 임시 DB·파일과 모의 요청을 사용합니다.
+`make check`는 정적 분석·포맷·문서 검사를, `make test`는 저장 로그 분석과 안전하게 격리한 모니터·수집 회귀 테스트를 실행합니다. 워커 PID 선택, 방화벽 상태, 원본 증빙 보호, 앱 종료 코드·수집 실패 전달을 임시 파일과 가짜 앱·명령으로 확인합니다. `make smoke`는 문법 검사와 저장 CPU 로그의 임시 출력 분석만 선택합니다(`uv run --frozen pytest -q -m smoke`). 실제 장애 재현과 수정한 수집기의 실호스트 동작은 이 테스트의 검증 범위에 포함하지 않습니다.
 
 ## 분석 자료
 

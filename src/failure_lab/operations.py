@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import shlex
 import sys
+from pathlib import Path
 
 from .config import agent_port, env_value, read_env_lines, replace_env_value
 from .constant import COLLECT, CONFIG, CPU_SAMPLER, ENV_KEYS, MONITOR, ROOT
@@ -65,16 +66,19 @@ def run_monitor(*, interactive: bool = True) -> int:
     return code
 
 
-def collect_evidence(*, interactive: bool = True) -> int:
+def collect_evidence(*, interactive: bool = True, output: Path | None = None) -> int:
     if interactive:
         header()
     print(S.title("증거 재수집"))
-    code = run([str(COLLECT)])
+    command = [str(COLLECT)]
+    if output is not None:
+        command.extend(["--output", str(output)])
+    code = run(command)
     pause(interactive)
     return code
 
 
-def sample_cpu(*, interactive: bool = True) -> int:
+def sample_cpu(*, interactive: bool = True, output: Path | None = None) -> int:
     if interactive:
         header()
     print(S.title("CPU 샘플링"))
@@ -105,6 +109,8 @@ def sample_cpu(*, interactive: bool = True) -> int:
         f"DURATION={shlex.quote(duration)} INTERVAL={shlex.quote(interval)} "
         f"{shlex.quote(str(CPU_SAMPLER))}"
     )
+    if output is not None:
+        command += f" --output {shlex.quote(str(output))}"
     code = run_shell(command)
     pause(interactive)
     return code

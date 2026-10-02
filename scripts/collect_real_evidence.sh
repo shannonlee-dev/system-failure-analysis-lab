@@ -4,12 +4,23 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 APP="$ROOT_DIR/assets/agent-app-leak/agent-app-leak"
-EVIDENCE_DIR="$ROOT_DIR/evidence"
 MONITOR="$ROOT_DIR/scripts/monitor.sh"
-RUN_ROOT="/tmp/codyssey-real-evidence"
 PORT="${AGENT_PORT:-15034}"
-
-mkdir -p "$RUN_ROOT"
+if [ "$#" -eq 0 ]; then
+  mkdir -p "$ROOT_DIR/.runtime/collections"
+  EVIDENCE_DIR="$(mktemp -d "$ROOT_DIR/.runtime/collections/run-XXXXXXXX")"
+elif [ "$#" -eq 2 ] && [ "$1" = --output ]; then
+  EVIDENCE_DIR="$2"
+  mkdir -p "$(dirname "$EVIDENCE_DIR")"
+  mkdir "$EVIDENCE_DIR" || { printf '[ERROR] output directory must be new\n' >&2; exit 2; }
+else
+  printf 'Usage: %s [--output NEW_DIRECTORY]\n' "$0" >&2
+  exit 2
+fi
+RUN_ROOT="$(mktemp -d)"
+ACTIVE_PID=""
+COLLECTION_FAILURES=0
+printf '[collect] output=%s\n' "$EVIDENCE_DIR"
 
 if [ ! -x "$APP" ] && [ -f "${APP}.zip" ]; then
   python3 - "$APP" "${APP}.zip" <<'PY'
@@ -49,6 +60,22 @@ kill_tree() {
   kill "$pid" 2>/dev/null || true
 }
 
+cleanup() {
+  if [ -n "$ACTIVE_PID" ]; then
+    kill_tree "$ACTIVE_PID"
+    wait "$ACTIVE_PID" 2>/dev/null || true
+  fi
+  rm -rf "$RUN_ROOT"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+{
+  printf 'collected_at=%s\n' "$(date -Iseconds)"
+  printf 'platform=%s\n' "$(uname -sm)"
+  printf 'binary_sha256=%s\n' "$(sha256sum "$APP" | cut -d' ' -f1)"
+} > "$EVIDENCE_DIR/run-metadata.txt"
+
 wait_for_ready_or_exit() {
   local pid="$1"
   local stdout_file="$2"
@@ -71,15 +98,30 @@ wait_for_ready_or_exit() {
 write_ps_top_sample() {
   local pid="$1"
   local out_file="$2"
+  local sample_status=0
+  local code=0
+  local children=""
+  local top_output=""
 
   {
     printf -- '--- ps sample ---\n'
-    ps -o pid,ppid,stat,pcpu,pmem,rss,comm,args -p "$pid" 2>/dev/null || true
-    pgrep -P "$pid" 2>/dev/null | xargs -r ps -o pid,ppid,stat,pcpu,pmem,rss,comm,args -p 2>/dev/null || true
+    ps -o pid,ppid,stat,pcpu,pmem,rss,comm,args -p "$pid" 2>&1 || {
+      code=$?; sample_status=1; printf 'ps exit_code=%s\n' "$code";
+    }
+    children="$(pgrep -P "$pid" 2>/dev/null)" || true
+    if [ -n "$children" ]; then
+      printf '%s\n' "$children" | xargs -r ps -o pid,ppid,stat,pcpu,pmem,rss,comm,args -p 2>&1 || {
+        code=$?; sample_status=1; printf 'child_ps exit_code=%s\n' "$code";
+      }
+    fi
     printf -- '\n--- top sample ---\n'
-    top -b -n 1 -p "$pid" 2>/dev/null | head -n 12 || true
+    top_output="$(top -b -n 1 -p "$pid" 2>&1)" || {
+      code=$?; sample_status=1; printf 'top exit_code=%s\n' "$code";
+    }
+    printf '%s\n' "$top_output" | sed -n '1,12p'
     printf '\n'
   } >> "$out_file"
+  return "$sample_status"
 }
 
 run_boot_failed() {
@@ -93,7 +135,7 @@ run_boot_failed() {
   : > "$target/stdout.log"
   : > "$target/stderr.log"
 
-  set +e
+  local app_exit=0
   AGENT_HOME="$home" \
   AGENT_PORT="$PORT" \
   AGENT_UPLOAD_DIR="$home/upload_files" \
@@ -102,8 +144,8 @@ run_boot_failed() {
   MEMORY_LIMIT=256 \
   CPU_MAX_OCCUPY=10 \
   MULTI_THREAD_ENABLE=false \
-  "$APP" > "$target/stdout.log" 2> "$target/stderr.log"
-  set -e
+  "$APP" > "$target/stdout.log" 2> "$target/stderr.log" || app_exit=$?
+  printf 'app_exit_code=%s\n' "$app_exit" > "$target/exit-status.txt"
 }
 
 run_scenario() {
@@ -156,7 +198,13 @@ run_scenario() {
   "$APP" > "$stdout_file" 2> "$stderr_file" &
 
   local pid="$!"
-  wait_for_ready_or_exit "$pid" "$stdout_file" || true
+  ACTIVE_PID="$pid"
+  local ready_status=0
+  local monitor_failures=0
+  local process_sample_failures=0
+  local stopped_by_collector=0
+  local app_exit=0
+  wait_for_ready_or_exit "$pid" "$stdout_file" || ready_status=$?
 
   local i=1
   while [ "$i" -le "$monitor_count" ]; do
@@ -171,7 +219,10 @@ run_scenario() {
     AGENT_APP_PID="$pid" \
     MONITOR_LOG_FILE="$monitor_log" \
     MONITOR_CPU_INTERVAL=1 \
-    "$MONITOR" >> "$monitor_stdout" 2>&1 || true
+    "$MONITOR" >> "$monitor_stdout" 2>&1 || {
+      printf 'sample=%s exit_code=%s\n' "$i" "$?" >> "$target/monitor-errors.txt"
+      monitor_failures=$((monitor_failures + 1))
+    }
     i=$((i + 1))
   done
 
@@ -180,7 +231,7 @@ run_scenario() {
     if ! kill -0 "$pid" 2>/dev/null; then
       break
     fi
-    write_ps_top_sample "$pid" "$ps_top"
+    write_ps_top_sample "$pid" "$ps_top" || process_sample_failures=$((process_sample_failures + 1))
     sleep 1
     i=$((i + 1))
   done
@@ -192,36 +243,45 @@ run_scenario() {
   done
 
   if kill -0 "$pid" 2>/dev/null; then
+    stopped_by_collector=1
     kill_tree "$pid"
   fi
-  wait "$pid" 2>/dev/null || true
+  wait "$pid" 2>/dev/null || app_exit=$?
+  ACTIVE_PID=""
+  printf 'launcher_pid=%s\napp_exit_code=%s\nready_exit_code=%s\nmonitor_failures=%s\nprocess_sample_failures=%s\nstopped_by_collector=%s\n' \
+    "$pid" "$app_exit" "$ready_status" "$monitor_failures" "$process_sample_failures" "$stopped_by_collector" > "$target/exit-status.txt"
+  if [ "$ready_status" -ne 0 ] || [ "$monitor_failures" -ne 0 ] || [ "$process_sample_failures" -ne 0 ]; then
+    return 1
+  fi
 }
 
 echo '[collect] boot-failed'
 run_boot_failed
 
 echo '[collect] boot-ready'
-run_scenario boot-ready boot-ready 512 10 false 8 1 0
+run_scenario boot-ready boot-ready 512 10 false 8 1 0 || COLLECTION_FAILURES=$((COLLECTION_FAILURES + 1))
 
 echo '[collect] scheduling-round-robin'
-run_scenario scheduling-round-robin scheduling/round-robin 512 10 false 8 0 0
+run_scenario scheduling-round-robin scheduling/round-robin 512 10 false 8 0 0 || COLLECTION_FAILURES=$((COLLECTION_FAILURES + 1))
 
 echo '[collect] oom-memory-50'
-run_scenario oom-memory-50 oom/memory-50 50 10 false 8 3 3
+run_scenario oom-memory-50 oom/memory-50 50 10 false 8 3 3 || COLLECTION_FAILURES=$((COLLECTION_FAILURES + 1))
 
 echo '[collect] oom-memory-128'
-run_scenario oom-memory-128 oom/memory-128 128 10 false 20 7 7
+run_scenario oom-memory-128 oom/memory-128 128 10 false 20 7 7 || COLLECTION_FAILURES=$((COLLECTION_FAILURES + 1))
 
 echo '[collect] cpu-max-10'
-run_scenario cpu-max-10 cpu/cpu-max-10 512 10 false 8 3 3
+run_scenario cpu-max-10 cpu/cpu-max-10 512 10 false 8 3 3 || COLLECTION_FAILURES=$((COLLECTION_FAILURES + 1))
 
 echo '[collect] cpu-max-100'
-run_scenario cpu-max-100 cpu/cpu-max-100 512 100 false 32 9 7
+run_scenario cpu-max-100 cpu/cpu-max-100 512 100 false 32 9 7 || COLLECTION_FAILURES=$((COLLECTION_FAILURES + 1))
 
 echo '[collect] deadlock-multi-true'
-run_scenario deadlock-multi-true deadlock/multi-true 512 10 true 16 0 6
+run_scenario deadlock-multi-true deadlock/multi-true 512 10 true 16 0 6 || COLLECTION_FAILURES=$((COLLECTION_FAILURES + 1))
 
 echo '[collect] deadlock-multi-false'
-run_scenario deadlock-multi-false deadlock/multi-false 512 10 false 8 0 6
+run_scenario deadlock-multi-false deadlock/multi-false 512 10 false 8 0 6 || COLLECTION_FAILURES=$((COLLECTION_FAILURES + 1))
 
 echo '[collect] done'
+printf 'scenario_collection_failures=%s\n' "$COLLECTION_FAILURES" > "$EVIDENCE_DIR/collection-status.txt"
+[ "$COLLECTION_FAILURES" -eq 0 ]
