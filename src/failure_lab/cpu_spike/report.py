@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime as dt
+import hashlib
 from pathlib import Path
 
 from .model import RateRow, SpikeWindow
@@ -15,6 +17,7 @@ def write_report(
     windows: list[SpikeWindow],
     plot_path: Path | None,
     csv_path: Path,
+    input_path: Path,
 ) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     total = len(rows)
@@ -36,6 +39,14 @@ def write_report(
     with out_path.open("w", encoding="utf-8") as file:
         file.write("# CPU 사용률 및 극대값 기반 급상승 구간 분석 리포트\n\n")
         file.write("## 1. 분석 개요\n\n")
+        file.write(
+            "이 결과는 저장된 로그의 재분석이며 새 장애 실험의 관측 결과가 아니다.\n\n"
+        )
+        file.write(f"- 입력 로그: `{input_path}`\n")
+        file.write(
+            f"- 입력 SHA-256: `{hashlib.sha256(input_path.read_bytes()).hexdigest()}`\n"
+        )
+        file.write(f"- 재분석 시각: {dt.datetime.now().astimezone().isoformat()}\n\n")
         file.write(
             "본 리포트는 `monitor.sh`로 수집한 CPU 사용률 로그를 기반으로, "
             "프로세스의 CPU 사용률 변화와 순간적인 증가 구간을 분석한 결과이다.\n\n"

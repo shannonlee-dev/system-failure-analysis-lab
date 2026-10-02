@@ -69,7 +69,9 @@ def main() -> int:
 
     write_csv(rows, args.csv)
     plot_ok = try_plot(rows, windows, args.plot)
-    write_report(args.report, rows, windows, args.plot if plot_ok else None, args.csv)
+    write_report(
+        args.report, rows, windows, args.plot if plot_ok else None, args.csv, args.input
+    )
 
     print(f"[OK] CSV: {args.csv}")
     if plot_ok:

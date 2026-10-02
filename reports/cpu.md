@@ -1,17 +1,17 @@
-# [장애] CPU 지연 - CPU 부하가 안전 임계치를 넘으면 CpuWorker 가드가 에이전트를 종료함
+# [장애] CPU 가드 위반 - 저장된 CpuWorker 로그 비교
 
 ## 1. 현상 설명
 
-CPU 케이스는 데드락 경로를 피하고 CPU 동작만 분리하기 위해 `MULTI_THREAD_ENABLE=false`로 재현했다. 에이전트는 정상적으로 시작했고 `CpuWorker`가 실행됐다. 두 구성을 비교했다:
+이 보고서는 2026-06-13의 과거 원본 로그를 대조한 해석이며 새 실험을 실행한 결과가 아니다. CPU 케이스는 `MULTI_THREAD_ENABLE=false`의 로그에서 정상 시작과 `CpuWorker` 실행을 확인했다. 두 구성을 비교했다:
 
 - 이전: `CPU_MAX_OCCUPY=100`
 - 이후: `CPU_MAX_OCCUPY=10`
 
-`CPU_MAX_OCCUPY=100`에서는 `CpuWorker` 부하가 안전 임계치를 넘어 프로세스가 종료됐다. `CPU_MAX_OCCUPY=10`에서는 작업자가 반복해서 `10.00%`에 도달한 뒤 냉각으로 들어가 위반 임계치를 넘지 않았다.
+`CPU_MAX_OCCUPY=100`에서는 `CpuWorker`의 가드 위반이 기록됐다. `CPU_MAX_OCCUPY=10`에서는 관측 구간에 `10.00%`에 도달한 뒤 냉각으로 들어간 기록이 남았다. 실제 종료 코드는 보존되어 있지 않다.
 
 ## 2. 증거 자료
 
-스크린샷 증거:
+보조 스크린샷(해당 두 실행의 PID·수집 시각과 일치하는지는 확인하지 않음):
 
 ![ps command snapshot](../screenshots/command_ps.png)
 
@@ -32,8 +32,8 @@ CPU 케이스는 데드락 경로를 피하고 CPU 동작만 분리하기 위해
 ```text
 CPU_MAX_OCCUPY=100:
 [CpuWorker] Started. Maximum CPU Limit: 100%
-[CpuWorker] Current Load: 48.25%
-[CpuWorker] CPU Threshold Violated! (51.86999999999999%).
+[CpuWorker] Current Load: 51.12%
+[CpuWorker] CPU Threshold Violated! (51.11999999999999%).
 
 CPU_MAX_OCCUPY=10:
 [CpuWorker] Started. Maximum CPU Limit: 10%
@@ -64,7 +64,7 @@ CPU 이슈는 에이전트의 자체 `CpuWorker` 가드가 제어한다. 완화�
 
 이전 및 이후:
 
-- `CPU_MAX_OCCUPY=100`: 부하가 `51.87%`까지 올라가 `CPU Threshold Violated`가 발생.
+- `CPU_MAX_OCCUPY=100`: 앱 로그의 부하가 `51.12%`까지 올라가 `CPU Threshold Violated`가 발생.
 - `CPU_MAX_OCCUPY=10`: 부하가 `10.00%`에 도달한 뒤 관측 구간 동안 위반 로그 없이 냉각.
 
-검증 결과: 통과. `CPU_MAX_OCCUPY`에 따라 CPU 가드 동작이 달라졌고, 표준 Linux 도구로 프로세스 PID를 캡처했다.
+현재 원본 로그는 환경별 가드 위반·냉각 기록을 뒷받침한다. `cpu-max-100/ps_top.log`는 비어 있고 두 구성의 모니터는 각각 2개 샘플 뒤 TCP 연결 실패로 끝난다. 모니터는 워커 대신 RSS 1.9MB의 런처를 측정했으므로 실제 워커의 CPU 부하·종료를 입증하는 자료로 사용할 수 없다. 새 수집기는 워커 PID·실패 상태를 보존하도록 수정했지만 실제 부하 실험은 재실행하지 않았다. 별도 spike 로그 분석은 재현되며 해당 로그를 이 가드 비교 실행과 동일한 관측으로 합치지 않는다.
