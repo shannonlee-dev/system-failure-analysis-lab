@@ -96,6 +96,26 @@ def child_pids(parent: int) -> set[int]:
     return children
 
 
+def select_monitor_pid(port: int, launch_pid: int | None = None) -> int | None:
+    """Select an agent TCP listener, preferring its worker over a launcher."""
+    listeners = pids_listening_on_port(port)
+    if launch_pid is None:
+        candidates = listeners & agent_process_pids()
+        return min(candidates) if candidates else None
+    pending = [(launch_pid, 0)]
+    seen: set[int] = set()
+    candidates: list[tuple[int, int]] = []
+    while pending:
+        pid, depth = pending.pop()
+        if pid in seen:
+            continue
+        seen.add(pid)
+        if pid in listeners:
+            candidates.append((depth, -pid))
+        pending.extend((child, depth + 1) for child in child_pids(pid))
+    return -max(candidates)[1] if candidates else None
+
+
 def pid_tree(roots: set[int]) -> list[int]:
     seen: set[int] = set()
 

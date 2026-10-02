@@ -2,6 +2,8 @@
 set -u
 set -o pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 AGENT_HOME="${AGENT_HOME:-/home/agent-admin/agent-app}"
 AGENT_PORT="${AGENT_PORT:-15034}"
 AGENT_LOG_DIR="${AGENT_LOG_DIR:-/var/log/agent-app}"
@@ -32,26 +34,11 @@ read_cmdline() {
 }
 
 find_agent_pid() {
-  if [ -n "${AGENT_APP_PID:-}" ] && [ -r "/proc/${AGENT_APP_PID}/cmdline" ]; then
-    printf '%s\n' "$AGENT_APP_PID"
-    return 0
+  local args=(--port "$AGENT_PORT")
+  if [ -n "${AGENT_APP_PID:-}" ]; then
+    args+=(--launch-pid "$AGENT_APP_PID")
   fi
-
-  for proc_dir in /proc/[0-9]*; do
-    pid="${proc_dir##*/}"
-    [ -r "${proc_dir}/cmdline" ] || continue
-    cmdline="$(read_cmdline "$pid")"
-    [ -n "$cmdline" ] || continue
-    first_arg="${cmdline%% *}"
-    base_name="${first_arg##*/}"
-    case "$cmdline" in
-      *monitor.sh*|*timeout\ *|*bash\ -lc*|*sh\ -c*) continue ;;
-    esac
-    if [[ "$cmdline" =~ $PROCESS_PATTERN ]] && [[ "$base_name" == agent-app* || "$cmdline" == *agent_app.py* ]]; then
-      printf '%s\n' "$pid"
-      return 0
-    fi
-  done
+  python3 "$SCRIPT_DIR/select_monitor_pid.py" "${args[@]}"
 }
 
 check_process() {
@@ -96,7 +83,7 @@ check_port() {
 check_firewall() {
   if command -v ufw >/dev/null 2>&1; then
     status="$(ufw status 2>/dev/null | head -n 1 || true)"
-    if printf '%s\n' "$status" | grep -qi 'active'; then
+    if printf '%s\n' "$status" | grep -qi '^Status: active$'; then
       printf 'Firewall status: [OK] UFW active\n'
     else
       warn "UFW is not active"
